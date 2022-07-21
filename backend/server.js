@@ -1,49 +1,34 @@
-require('dotenv').config();
+require("dotenv").config();
 
-const express = require('express');
+const express = require("express");
+const mongoose = require("mongoose");
+const workoutsRoutes = require("./routes/workouts");
 
 // express app
 const app = express();
 
 // middleware
+
+app.use(express.json());
+
 app.use((req, res, next) => {
   console.log(req.path, req.method);
   next();
 });
 
 // routes
-app.get('/', (req, res) => {
-  res.json({ mssg: 'Welcome to the app home page' });
-});
+app.use("/api/workouts", workoutsRoutes);
 
-// GET a new request from WORKOUT
-
-app.get('/api/workouts', (req, res) => {
-  res.json({ mssg: ' GET a new request from workwout' });
-});
-
-// POSTE a new request WORKOUT
-app.post('/api/workouts', (req, res) => {
-  res.json({ mssg: ' POST  a new request' });
-});
-
-// UPDATE a new request WORKOUT
-
-app.patch('/api/workouts/:id', (req, res) => {
-  res.json({ mssg: ' UPDATE a new request from workout' });
-});
-
-// DELETE  a new request
-
-app.delete('/api/workouts/:id', (req, res) => {
-  res.json({ mssg: ' DELETE  a new request' });
-});
-
-// LISTEN for requests
-app.listen(4000, () => {
-  console.log('listening on port', process.env.PORT);
-});
-
-//  inmportant notes
-
-//  dotenv file is undefined
+// connect to db
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => {
+    // LISTEN for requests
+    //  we are going  to listen to requests ONVE we are connect to the database
+    app.listen(process.env.PORT, () => {
+      console.log("connected to db and listening on port ", process.env.PORT);
+    });
+  })
+  .catch((error) => {
+    console.log(error);
+  });
